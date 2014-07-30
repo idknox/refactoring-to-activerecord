@@ -30,11 +30,11 @@ class App < Sinatra::Application
   end
 
   post "/registrations" do
-    user = User.create(
+    user = User.new(
       :username => params[:username],
       :password => params[:password]
     )
-    if user.errors.full_messages == []
+    if user.save
       flash[:notice] = "Thanks for registering"
       redirect "/"
     else
