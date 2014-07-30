@@ -1,8 +1,8 @@
+
 feature "Logged in user" do
 
   def register_user(username, password)
     visit "/"
-
     click_link "Register"
 
     fill_in "Username", with: username
