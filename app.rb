@@ -68,12 +68,7 @@ class App < Sinatra::Application
   end
 
   delete "/users/:id" do
-    delete_sql = <<-SQL
-    DELETE FROM users
-    WHERE id = #{params[:id]}
-    SQL
-
-    @database_connection.sql(delete_sql)
+    User.find(params[:id]).destroy
 
     redirect "/"
   end
@@ -83,19 +78,18 @@ class App < Sinatra::Application
   end
 
   get "/fish/:id" do
-    fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
+    fish = User.find(params[:id])
     erb :"fish/show", locals: {fish: fish}
   end
 
   post "/fish" do
     if validate_fish_params
-      insert_sql = <<-SQL
-      INSERT INTO fish (name, wikipedia_page, user_id)
-      VALUES ('#{params[:name]}', '#{params[:wikipedia_page]}', #{current_user["id"]})
-      SQL
-
-      @database_connection.sql(insert_sql)
-
+      fish = Fish.new(
+        :name => params[:name],
+        :wikipedia_page => params[:wikipedia_page],
+        :user_id => current_user.id
+      )
+      fish.save
       flash[:notice] = "Fish Created"
 
       redirect "/"
