@@ -34,30 +34,31 @@ class App < Sinatra::Application
       :username => params[:username],
       :password => params[:password]
     )
+
     if user.save
       flash[:notice] = "Thanks for registering"
       redirect "/"
     else
       flash[:notice] = ""
-      user.errors.full_messages.each {|error| flash[:notice] += error}
+      user.errors.full_messages.each { |error| flash[:notice] += error }
       redirect back
     end
-
-    flash[:notice] = "Thanks for registering"
-    redirect "/"
   end
 
   post "/sessions" do
-    if validate_authentication_params
-      user = authenticate_user
-
-      if user != nil
-        session[:user_id] = user["id"]
+    errors = User.login_errors(params[:username], params[:password])
+    unless errors
+      user = User.find_by(
+        :username => params[:username],
+        :password => params[:password]
+      )
+      if user
+        session[:user_id] = user.id
       else
         flash[:notice] = "Username/password is invalid"
       end
     end
-
+    flash[:notice] = errors
     redirect "/"
   end
 
@@ -105,14 +106,6 @@ class App < Sinatra::Application
 
   private
 
-  # def validate_registration_params(user)
-  #   if user.valid?
-  #     return true
-  #   else
-  #     flash[:notice] = user.errors.join(", ")
-  #   false
-  # end
-
   def validate_fish_params
     if params[:name] != "" && params[:wikipedia_page] != ""
       return true
@@ -134,23 +127,7 @@ class App < Sinatra::Application
   end
 
   def validate_authentication_params
-    if params[:username] != "" && params[:password] != ""
-      return true
-    end
 
-    error_messages = []
-
-    if params[:username] == ""
-      error_messages.push("Username is required")
-    end
-
-    if params[:password] == ""
-      error_messages.push("Password is required")
-    end
-
-    flash[:notice] = error_messages.join(", ")
-
-    false
   end
 
   def username_available?(username)
@@ -175,4 +152,5 @@ class App < Sinatra::Application
       nil
     end
   end
+
 end
