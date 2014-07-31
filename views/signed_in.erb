@@ -1,4 +1,4 @@
-<p>Welcome, <%= current_user["username"] %></p>
+<p>Welcome, <%= current_user.username %></p>
 
 <form action="/sessions" method="post">
   <input type="hidden" name="_method" value="delete"/>
@@ -10,8 +10,8 @@
 <ul class="user-list">
   <% users.each do |user| %>
     <li>
-      <%= user["username"] %>
-      <form method="post" action="/users/<%= user["id"] %>">
+      <%= user.username %>
+      <form method="post" action="/users/<%= user.id %>">
         <input type="hidden" name="_method" value="delete" />
         <input type="submit" value="Delete" />
       </form>
@@ -26,7 +26,7 @@
 <ul class="fish-list">
   <% fish_list.each do |fish| %>
     <li>
-      <a href="/fish/<%= fish["id"] %>"><%= fish["name"] %></a>
+      <a href="/fish/<%= fish.id %>"><%= fish.name %></a>
     </li>
   <% end %>
 </ul>
