@@ -14,9 +14,8 @@ class App < Sinatra::Application
   end
 
   get "/" do
-    user = current_user
-
-    if current_user
+    if session[:user_id]
+      user = User.find(session[:user_id])
       users = User.where('id <> ?', user.id)
       fish = Fish.where(:user_id => user.id)
       erb :signed_in, locals: {current_user: user, users: users, fish_list: fish}
@@ -86,7 +85,7 @@ class App < Sinatra::Application
     fish = Fish.new(
       :name => params[:name],
       :wikipedia_page => params[:wikipedia_page],
-      :user_id => current_user.id
+      :user_id => session[:user_id]
     )
 
     if fish.save
@@ -96,17 +95,6 @@ class App < Sinatra::Application
       flash[:notice] = ""
       fish.errors.full_messages.each { |error| flash[:notice] += error }
       redirect back
-    end
-  end
-
-  private
-
-
-  def current_user
-    if session[:user_id]
-      User.find(session[:user_id])
-    else
-      nil
     end
   end
 
